@@ -339,6 +339,179 @@ public:
 
 
 
+
+
+
+
+#include <iostream>
+using namespace std;
+
+class Node {
+public:
+    int height;
+    string id;
+    Node* left;
+    Node* right;
+
+    Node(string id) {
+        this->id = id;
+        height = 0;
+        left = NULL;
+        right = NULL;
+    }
+};
+
+class AVL {
+public:
+    Node* root;
+
+    AVL() {
+        root = NULL;
+    }
+
+    int Height(Node* node) {
+        if (node == NULL) {
+            return -1;  
+        }
+        return node->height;
+    }
+
+    int balance(Node* node) {
+        if (node == NULL) {
+            return 0;  
+        }
+        return Height(node->left) - Height(node->right);
+    }
+
+    Node* insert(Node* node, string id) {
+        if (node == NULL) {
+            return new Node(id);
+        }
+
+        if (id > node->id) {
+            node->right = insert(node->right, id);
+        }
+        else if (id < node->id) {
+            node->left = insert(node->left, id);
+        }
+        else {
+            return node; 
+        }
+
+        node->height = max(Height(node->left), Height(node->right)) + 1;
+        return checker(node);
+    }
+
+    Node* RotateRight(Node* k1) {
+        Node* k2 = k1->left;
+        k1->left = k2->right;
+        k2->right = k1;
+        k1->height = max(Height(k1->left), Height(k1->right)) + 1;
+        k2->height = max(Height(k2->left), Height(k2->right)) + 1;
+        return k2;
+    }
+
+    Node* RotateLeft(Node* k1) {
+        Node* k2 = k1->right;
+        k1->right = k2->left;
+        k2->left = k1;
+        k1->height = max(Height(k1->left), Height(k1->right)) + 1;
+        k2->height = max(Height(k2->left), Height(k2->right)) + 1;
+        return k2;
+    }
+
+    Node* rightLeft(Node* k1) {
+        k1->right = RotateRight(k1->right);
+        return RotateLeft(k1);
+    }
+
+    Node* leftRight(Node* k1) {
+        k1->left = RotateLeft(k1->left);
+        return RotateRight(k1);
+    }
+
+    Node* checker(Node* node) {
+        int bal = balance(node);
+        if (bal == 2) {
+            if (balance(node->left) >= 0) {
+                return RotateRight(node);
+            }
+            else {
+                return leftRight(node);
+            }
+        }
+        else if (bal == -2) {
+            if (balance(node->right) <= 0) {
+                return RotateLeft(node);
+            }
+            else {
+                return rightLeft(node);
+            }
+        }
+        return node;  
+    }
+
+    void preOrder(Node* node) {
+        if (node != nullptr) {
+            cout << node->id << endl;
+            preOrder(node->left);
+            preOrder(node->right);
+        }
+    }
+
+    Node* Min1(Node* node) {
+        while (node->left != NULL) {
+            node = node->left;
+        }
+        return node;
+    }
+
+    Node* deleter2(Node* root, string id) {
+        if (root==NULL) {
+            return root;
+        }
+        if (id < root->id) {
+            root->left = deleter2(root->left, id);
+        }
+        else if (id > root->id) {
+            root->right = deleter2(root->right, id);
+        }
+        else {
+            if (root->left == NULL && root->right == NULL) {
+                delete root;
+                return NULL;
+            }
+            else if (root->left == NULL) {
+                Node* temp = root->right;
+                delete root;
+                return temp;
+            }
+            else if (root->right == NULL) {
+                Node* temp = root->left;
+                delete root;
+                return temp;
+            }
+            Node* temp = Min1(root->right);
+            root->id = temp->id;
+            root->right = deleter2(root->right, temp->id);
+        }
+        root->height = max(Height(root->left), Height(root->right)) + 1;
+        return checker(root);
+    }
+
+    void insert(string id) {
+        root = insert(root, id);
+    }
+
+    void deleter(string id) {
+        root = deleter2(root, id);
+    }
+};
+
+
+
+
+
 int main() {
     MaxHeap heap;
     heap.insert(10);
