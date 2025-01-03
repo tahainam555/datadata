@@ -204,6 +204,139 @@ void dijkstra(int source) {
 }
 
 
+#include <iostream>
+using namespace std;
+
+class Node {
+public:
+    int data;
+    Node* left;
+    Node* right;
+    int height;
+
+    Node(int value) {
+        data = value;
+        left = right = nullptr;
+        height = 1; // Height of a new node is initially 1
+    }
+};
+
+class AVLTree {
+private:
+    Node* root;
+
+    // Get the height of a node
+    int height(Node* node) {
+        return (node == nullptr) ? 0 : node->height;
+    }
+
+    // Get the balance factor of a node
+    int getBalanceFactor(Node* node) {
+        return (node == nullptr) ? 0 : height(node->left) - height(node->right);
+    }
+
+    // Right rotation
+    Node* rightRotate(Node* y) {
+        Node* x = y->left;
+        Node* T2 = x->right;
+
+        // Perform rotation
+        x->right = y;
+        y->left = T2;
+
+        // Update heights
+        y->height = max(height(y->left), height(y->right)) + 1;
+        x->height = max(height(x->left), height(x->right)) + 1;
+
+        return x; // New root
+    }
+
+    // Left rotation
+    Node* leftRotate(Node* x) {
+        Node* y = x->right;
+        Node* T2 = y->left;
+
+        // Perform rotation
+        y->left = x;
+        x->right = T2;
+
+        // Update heights
+        x->height = max(height(x->left), height(x->right)) + 1;
+        y->height = max(height(y->left), height(y->right)) + 1;
+
+        return y; // New root
+    }
+
+    // Insert a node into the AVL tree
+    Node* insertNode(Node* node, int data) {
+        if (node == nullptr)
+            return new Node(data);
+
+        if (data < node->data)
+            node->left = insertNode(node->left, data);
+        else if (data > node->data)
+            node->right = insertNode(node->right, data);
+        else
+            return node; // Duplicate keys are not allowed
+
+        // Update height of the current node
+        node->height = max(height(node->left), height(node->right)) + 1;
+
+        // Get the balance factor
+        int balance = getBalanceFactor(node);
+
+        // Balance the tree
+        // Left Left Case
+        if (balance > 1 && data < node->left->data)
+            return rightRotate(node);
+
+        // Right Right Case
+        if (balance < -1 && data > node->right->data)
+            return leftRotate(node);
+
+        // Left Right Case
+        if (balance > 1 && data > node->left->data) {
+            node->left = leftRotate(node->left);
+            return rightRotate(node);
+        }
+
+        // Right Left Case
+        if (balance < -1 && data < node->right->data) {
+            node->right = rightRotate(node->right);
+            return leftRotate(node);
+        }
+
+        return node; // Return the unchanged node
+    }
+
+    // Inorder traversal
+    void inorderTraversal(Node* node) {
+        if (node != nullptr) {
+            inorderTraversal(node->left);
+            cout << node->data << " ";
+            inorderTraversal(node->right);
+        }
+    }
+
+public:
+    // Constructor
+    AVLTree() {
+        root = nullptr;
+    }
+
+    // Public insert function
+    void insert(int data) {
+        root = insertNode(root, data);
+    }
+
+    // Public inorder traversal
+    void inorder() {
+        inorderTraversal(root);
+        cout << endl;
+    }
+};
+
+
 
 
 int main() {
