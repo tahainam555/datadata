@@ -530,3 +530,154 @@ int main() {
     return 0;
 }
 
+
+#include <iostream>
+using namespace std;
+
+// Node structure
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+
+    Node(int value) {
+        data = value;
+        left = nullptr;
+        right = nullptr;
+    }
+};
+
+// BST class
+class BST {
+private:
+    Node* root;
+
+    // Helper function for insertion
+    Node* insert(Node* node, int value) {
+        if (node == nullptr) {
+            return new Node(value);
+        }
+        if (value < node->data) {
+            node->left = insert(node->left, value);
+        } else {
+            node->right = insert(node->right, value);
+        }
+        return node;
+    }
+
+    // Helper function for preorder traversal
+    void preorder(Node* node) {
+        if (node == nullptr) return;
+        cout << node->data << " ";
+        preorder(node->left);
+        preorder(node->right);
+    }
+
+    // Helper function for inorder traversal
+    void inorder(Node* node) {
+        if (node == nullptr) return;
+        inorder(node->left);
+        cout << node->data << " ";
+        inorder(node->right);
+    }
+
+    // Helper function for postorder traversal
+    void postorder(Node* node) {
+        if (node == nullptr) return;
+        postorder(node->left);
+        postorder(node->right);
+        cout << node->data << " ";
+    }
+
+    // Custom BFS using a simple array as a queue
+    void bfs(Node* root) {
+        if (root == nullptr) return;
+
+        Node* queue[100];  // Static array to simulate a queue
+        int front = 0, rear = 0;
+
+        // Enqueue root
+        queue[rear++] = root;
+
+        while (front < rear) {
+            // Dequeue a node
+            Node* current = queue[front++];
+
+            // Process the node
+            cout << current->data << " ";
+
+            // Enqueue left child
+            if (current->left != nullptr) {
+                queue[rear++] = current->left;
+            }
+
+            // Enqueue right child
+            if (current->right != nullptr) {
+                queue[rear++] = current->right;
+            }
+        }
+    }
+
+public:
+    // Constructor
+    BST() {
+        root = nullptr;
+    }
+
+    // Insert value into BST
+    void insert(int value) {
+        root = insert(root, value);
+    }
+
+    // BFS (Level Order Traversal)
+    void bfs() {
+        bfs(root);
+        cout << endl;
+    }
+
+    // DFS Traversals
+    void preorder() {
+        preorder(root);
+        cout << endl;
+    }
+
+    void inorder() {
+        inorder(root);
+        cout << endl;
+    }
+
+    void postorder() {
+        postorder(root);
+        cout << endl;
+    }
+};
+
+// Main function
+int main() {
+    BST tree;
+
+    // Insert values
+    tree.insert(10);
+    tree.insert(5);
+    tree.insert(15);
+    tree.insert(3);
+    tree.insert(7);
+    tree.insert(12);
+    tree.insert(18);
+
+    // Perform traversals
+    cout << "BFS (Level Order): ";
+    tree.bfs();
+
+    cout << "DFS Preorder: ";
+    tree.preorder();
+
+    cout << "DFS Inorder: ";
+    tree.inorder();
+
+    cout << "DFS Postorder: ";
+    tree.postorder();
+
+    return 0;
+}
+
