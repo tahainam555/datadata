@@ -809,3 +809,87 @@ class priorityQ
     }
 };
 
+
+
+
+
+
+
+
+
+        void ASearch(char start, char end) {
+            cout << "Emergency vehicle is being routed..." << endl;
+
+            int startVertex = vertexHash(start);
+            int endVertex = vertexHash(end);
+
+            for (int i = 0; i < graph->vertices; i++) {
+                distance[i] = 99999;
+                visited[i] = false;
+                previous[i] = ' ';
+            }
+            distance[startVertex] = 0;
+            P1->enqueue(0, start);
+
+            bool pathFound = false;
+
+            while (!P1->isEmpty()) {
+                char current = P1->peekIntersection();
+                P1->dequeue();
+
+                int currVertex = vertexHash(current);
+                if (visited[currVertex]) {
+                    continue;
+                }
+                visited[currVertex] = true;
+
+                if (current == end) {
+                    pathFound = true;
+                    break;
+                }
+
+                Node *neighbour = graph->list[currVertex].head;
+                while (neighbour != NULL) {
+                    int neighborVertex = vertexHash(neighbour->vertex);
+                    if (visited[neighborVertex]) {
+                        neighbour = neighbour->next;
+                        continue;
+                    }
+
+                    float newCost = distance[currVertex] + neighbour->weight;
+                    float heuristic = abs(neighborVertex - endVertex); // Heuristic (Manhattan distance)
+                    float totalCost = newCost + heuristic;
+
+                    if (newCost < distance[neighborVertex]) {
+                        distance[neighborVertex] = newCost;
+                        previous[neighborVertex] = current;
+                        P1->enqueue(totalCost, neighbour->vertex);
+                    }
+
+                    neighbour = neighbour->next;
+                }
+            }
+
+            if (!pathFound) {
+                cout << "No path exists from " << start << " to " << end << "." << endl;
+                return; 
+            }
+
+            // Construct the path
+            char current = end;
+            // for(int i=0; i<graph->vertices; i++)
+            // {
+            //     signals[i].isGreen = false;
+            // }
+            while (current != start) {
+                overrideSignals(current);  
+                S1.push(current);
+                current = previous[vertexHash(current)];
+            }
+            overrideSignals(start);
+            S1.push(start);
+
+            printPath(start, end);
+
+            restoreSignals(); 
+        }
